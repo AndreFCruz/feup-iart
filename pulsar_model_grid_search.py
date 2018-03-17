@@ -152,6 +152,6 @@ for mean, stdev, param in zip(means, stds, params):
 # In[14]:
 
 
-model_path = os.path.join(MODELS_DIR, 'grid_search_8_8_' + ('%.2f' % (grid.best_score_ * 100)) + '.h5')
+model_path = os.path.join(MODELS_DIR, 'grid_search_best_' + ('%.2f' % (grid.best_score_ * 100)) + '.h5')
 grid.best_estimator_.model.save(model_path)
 
