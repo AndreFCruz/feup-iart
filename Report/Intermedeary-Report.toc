@@ -3,9 +3,8 @@
 \contentsline {section}{\numberline {2}Descri\IeC {\c c}\IeC {\~a}o}{4}
 \contentsline {subsection}{\numberline {2.1}Especifica\IeC {\c c}\IeC {\~a}o}{4}
 \contentsline {subsubsection}{\numberline {2.1.1}Descri\IeC {\c c}\IeC {\~a}o e an\IeC {\'a}lise do dataset. Pr\IeC {\'e}-processamento dos dados.}{4}
-\contentsline {subsubsection}{\numberline {2.1.2}Modelo de aprendizagem a aplicar: \IeC {\'a}rvores de decis\IeC {\~a}o / redes neuronais.}{4}
-\contentsline {subsubsection}{\numberline {2.1.3}\IeC {\'A}rvores de decis\IeC {\~a}o: variantes e op\IeC {\c c}\IeC {\~o}es dos algoritmos a utilizar.}{4}
-\contentsline {subsubsection}{\numberline {2.1.4}Redes neuronais: arquitectura, configura\IeC {\c c}\IeC {\~a}o prevista da rede.}{4}
+\contentsline {subsubsection}{\numberline {2.1.2}Modelo de aprendizagem a aplicar: redes neuronais.}{4}
+\contentsline {subsubsection}{\numberline {2.1.3}Redes neuronais: arquitectura, configura\IeC {\c c}\IeC {\~a}o prevista da rede.}{4}
 \contentsline {subsection}{\numberline {2.2}Trabalho Efetuado}{4}
 \contentsline {subsection}{\numberline {2.3}Resultados esperados e forma de avalia\IeC {\c c}\IeC {\~a}o}{4}
 \contentsline {section}{\numberline {3}Conclus\IeC {\~o}es}{5}
