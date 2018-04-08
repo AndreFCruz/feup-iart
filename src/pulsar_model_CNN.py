@@ -9,7 +9,9 @@ import os
 
 np.random.seed(42)
 
-DATA_PATH = 'dataset'
+BASE_PATH = '../'
+DATA_PATH = BASE_PATH + 'dataset'
+MODELS_DIR = BASE_PATH + "models"
 
 
 # In[2]:
@@ -52,8 +54,6 @@ def split_train_dataset(data, test_ratio):
 
 # Save Model
 import os
-
-MODELS_DIR = "models"
 
 def save_model(model, name, acc=None):
     name += str(model.input.shape[1])
