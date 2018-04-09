@@ -74,8 +74,8 @@ X_test, Y_test = test_set[:, :-1], test_set[:, -1]
 model = Sequential()
 
 input_dimension = np.size(X_train, axis=1)
-model.add(Dense(16, input_dim=input_dimension, activation='relu'))
-model.add(Dense(12, activation='relu'))
+model.add(Dense(32, input_dim=input_dimension, activation='sigmoid'))
+# model.add(Dense(16, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
 
 # In[186]:
@@ -97,6 +97,14 @@ scores = model.evaluate(X_test, Y_test)
 # In[189]:
 
 print("Accuracy:", scores[1] * 100)
+
+
+# Classification metrics on test data
+from sklearn.metrics import classification_report
+
+predictions = model.predict(X_test)
+Y_test_predictions = [int(y + 0.5) for y in predictions]
+print(classification_report(Y_test, Y_test_predictions))
 
 # In[190]:
 
