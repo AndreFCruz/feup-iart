@@ -3,15 +3,15 @@ import numpy as np
 from sklearn.model_selection import KFold
 from sklearn.metrics import classification_report
 from functools import reduce
+import random
+import string
 
 BASE_PATH = '../'
 DATA_PATH = BASE_PATH + 'dataset'
 MODELS_DIR = BASE_PATH + "models"
 
 
-def cross_validation(model, X, Y, k,
-                     train_function=train_model,
-                     test_function=evaluate_model):
+def cross_validation(model, X, Y, k, train_function, test_function):
     """
     Performs k-fold cross-validation on a given model.
     Calls the passed train_model function and test_model
@@ -22,9 +22,10 @@ def cross_validation(model, X, Y, k,
     for train_indices, test_indices in kf.split(X):
         X_train, X_test = X[train_indices], X[test_indices]
         Y_train, Y_test = Y[train_indices], Y[test_indices]
+        # TODO clear model weights before retraining on new set
         train_function(model, X_train, Y_train)
         score = test_function(model, X_test, Y_test)
-        scores.push_back(score)
+        scores.append(score)
 
     # Return average of scores
     return reduce((lambda x, y: x + y), scores) / len(scores)
@@ -59,6 +60,9 @@ def save_model(model, name, acc=None):
     name += "_" + (('_%.2f' % acc) if acc is not None else "")
     path = os.path.join(MODELS_DIR, name + ".h5")
     model.save(path)
+
+def generate_random_string(n=4):
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=n))
 
 class Logger(object):
     def __init__(self, path):
