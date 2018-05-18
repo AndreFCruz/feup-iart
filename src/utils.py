@@ -1,6 +1,7 @@
 import sys, os, io
 import numpy as np
-from sklearn.model_selection import KFold
+from keras import backend as K
+from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import classification_report
 from functools import reduce
 import random
@@ -17,15 +18,21 @@ def cross_validation(model, X, Y, k, train_function, test_function):
     Calls the passed train_model function and test_model
      for every data split.
     """
-    kf = KFold(n_splits=k)
+    kf = StratifiedKFold(n_splits=k)
     scores = []
     for train_indices, test_indices in kf.split(X):
         X_train, X_test = X[train_indices], X[test_indices]
         Y_train, Y_test = Y[train_indices], Y[test_indices]
-        # TODO clear model weights before retraining on new set
+
+        # train model
         train_function(model, X_train, Y_train)
+
+        # test/evaluate model
         score = test_function(model, X_test, Y_test)
         scores.append(score)
+
+        # clear model weights for next iteration
+        reset_weights(model)
 
     # Return average of scores
     return reduce((lambda x, y: x + y), scores) / len(scores)
@@ -35,6 +42,12 @@ def train_model(model, X_train, Y_train):
 
 def evaluate_model(model, X_test, Y_test):
     return model.evaluate(X_test, Y_test)[1]
+
+def reset_weights(model):
+    session = K.get_session()
+    for layer in model.layers:
+        if hasattr(layer, 'kernel_initializer'):
+            layer.kernel.initializer.run(session=session)
 
 def evaluate_classwise(model, X_test, Y_test):
     predictions = model.predict(X_test)

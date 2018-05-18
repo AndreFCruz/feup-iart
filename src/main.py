@@ -1,6 +1,7 @@
 import numpy as np
 from utils import *
 from models import create_model
+from keras.callbacks import TensorBoard
 
 np.random.seed(42)
 
@@ -18,10 +19,14 @@ X_test, Y_test = test_set[:, :-1], test_set[:, -1]
 model = create_model(np.size(X_train, axis=1))
 
 # Train Model
-model.fit(X_train, Y_train, epochs=10, batch_size=16,
+tb_callback = TensorBoard(log_dir='../Graph/' + MODEL_NAME, histogram_freq=5, write_graph=True, write_images=True)
+
+model.fit(X_train, Y_train, epochs=200, batch_size=16,
         validation_data=(X_test, Y_test),
+        callbacks=[tb_callback]
         # class_weight={0: 0.5, 1: 1.0}
         )
+
 
 # Evaluate Model
 logger = Logger(LOGS_FILE)
