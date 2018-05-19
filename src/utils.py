@@ -60,7 +60,7 @@ def evaluate_model(model, X_test, Y_test):
     acc = model.evaluate(X_test, Y_test)[1]
     y_pred = [int(p + 0.5) for p in model.predict(X_test)]
     ret = precision_recall_fscore_support(Y_test, y_pred)
-    print(ret)
+
     return {
         'acc': acc,
         'precision_0': ret[0][0],
@@ -106,19 +106,3 @@ def save_model(model, name, acc=None):
 
 def generate_random_string(n=4):
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=n))
-
-class Logger(object):
-    def __init__(self, path):
-        self.file = open(path, 'w')
-        self.stdout = sys.stdout
-        sys.stdout = self
-    def __del__(self):
-        self.close()
-    def write(self, data):
-        self.file.write(data)
-        self.stdout.write(data)
-    def flush(self):
-        self.file.flush()
-    def close(self):
-        sys.stdout = self.stdout
-        self.file.close()

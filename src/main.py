@@ -1,6 +1,7 @@
 import sys
 import numpy as np
-from utils import cross_validate, train_test_split, generate_random_string, load_pulsar_csv
+from utils import cross_validate, train_test_split, generate_random_string, load_pulsar_csv, evaluate_classwise, evaluate_model
+from Logger import Logger
 from models import create_model
 from keras.callbacks import TensorBoard, EarlyStopping
 from tensorboard import summary as summary_lib
@@ -27,7 +28,6 @@ callbacks = [
         PRTensorBoard(log_dir=('../Graph/' + MODEL_NAME), write_images=True),
         EarlyStopping(monitor='val_acc', patience=15)
         ]
-# callbacks = [ TensorBoard(log_dir='../Graph/' + MODEL_NAME, histogram_freq=5, write_graph=True, write_images=True) ]
 
 ### NOTE Balancing class weights
 # from sklearn.utils import class_weight
@@ -38,41 +38,35 @@ callbacks = [
 ###
 
 # Train Model
-# model.fit(X_train, Y_train, epochs=100, batch_size=16,
-#         validation_data=(X_test, Y_test),
-#         callbacks=callbacks
-#         )
+model.fit(X_train, Y_train, epochs=100, batch_size=16,
+        validation_data=(X_test, Y_test),
+        callbacks=callbacks
+        )
 
 
-# Evaluate Model
-# logger = Logger(LOGS_FILE)
-# scores = model.evaluate(X_test, Y_test)
-# print("Overall Accuracy: %.2f\n" % (scores[1] * 100))
-# print(evaluate_classwise(model, X_test, Y_test))
-# logger.close()
+## Evaluate Model
+logger = Logger(LOGS_FILE)
+scores = model.evaluate(X_test, Y_test)
+print("Overall Accuracy: %.2f\n" % (scores[1] * 100))
+print(evaluate_classwise(model, X_test, Y_test))
+ret = evaluate_model(model, X_test, Y_test)
+print("Classwise Results: ", ret)
+logger.close()
 
 
-# Undersampling!
-from imblearn.under_sampling import RandomUnderSampler
-rus = RandomUnderSampler(return_indices=True)
-X_resampled, y_resampled, idx_resampled = rus.fit_sample(pulsars[:,:-1], pulsars[:,-1])
+## NOTE Undersampling!
+# from imblearn.under_sampling import RandomUnderSampler
+# rus = RandomUnderSampler(return_indices=True)
+# X_resampled, y_resampled, idx_resampled = rus.fit_sample(pulsars[:,:-1], pulsars[:,-1])
 
-from utils import train_model, evaluate_model
-ret = cross_validate(model, pulsars[:,:-1], pulsars[:,-1], 10,
-        train_model,
-        evaluate_model)
+## NOTE K-Fold Cross-Validation
+# from utils import train_model, evaluate_model
+# ret = cross_validate(model, pulsars[:,:-1], pulsars[:,-1], 10,
+#         train_model,
+#         evaluate_model)
 
-print("Result: ", ret)
-
-## TODO
-
-
-# K-Fold Cross-Validation
-# score = cross_validation(
-#                 model, pulsars[:,:-1], pulsars[:,-1], k=3,
-#                 train_function=train_model, test_function=evaluate_model
-#             )
-# print("Cross Validated Score: %f" % score)
+# print("Result: ", ret)
+## NOTE END
 
 # print('Saving model...')
 # save_model(model, MODEL_NAME, scores[1] * 100)
