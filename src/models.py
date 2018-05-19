@@ -10,6 +10,5 @@ def create_model(input_dim):
     output = Dense(1, activation='sigmoid')(input)
 
     model = Model(inputs=input, outputs=output)
-
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
     return model
