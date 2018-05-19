@@ -49,8 +49,7 @@ logger = Logger(LOGS_FILE)
 scores = model.evaluate(X_test, Y_test)
 print("Overall Accuracy: %.2f\n" % (scores[1] * 100))
 print(evaluate_classwise(model, X_test, Y_test))
-ret = evaluate_model(model, X_test, Y_test)
-print("Classwise Results: ", ret)
+# print("Classwise Results: ", evaluate_model(model, X_test, Y_test))
 logger.close()
 
 
