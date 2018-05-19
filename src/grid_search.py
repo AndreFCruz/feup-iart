@@ -5,7 +5,7 @@ import pickle
 
 def grid_search_params(create_model, param_grid, X, Y):
     # SKLearn wrapper for Keras classifier
-    model = KerasClassifier(build_fn=create_model, epochs=100, verbose=2)
+    model = KerasClassifier(build_fn=create_model, epochs=1, verbose=2)
     # Setup Grid
     grid = GridSearchCV(estimator=model, param_grid=param_grid)
     # Train Models
@@ -54,6 +54,9 @@ if __name__ == "__main__":
     }
 
     from models import create_model_grid_search
-    grid_search_params(create_model_grid_search, param_grid, X, Y)
+    best_model = grid_search_params(create_model_grid_search, param_grid, X, Y)
+
+    from utils import evaluate_model
+    evaluate_model(best_model.model, X, Y)
 
     logger.close()
