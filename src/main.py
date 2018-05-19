@@ -58,7 +58,7 @@ rus = RandomUnderSampler(return_indices=True)
 X_resampled, y_resampled, idx_resampled = rus.fit_sample(pulsars[:,:-1], pulsars[:,-1])
 
 from utils import train_model, evaluate_model
-ret = cross_validate(model, pulsars[:,:-1], pulsars[:,-1], 5,
+ret = cross_validate(model, pulsars[:,:-1], pulsars[:,-1], 10,
         train_model,
         evaluate_model)
 

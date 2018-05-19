@@ -2,7 +2,7 @@ import sys, os, io
 import numpy as np
 from keras import backend as K
 from sklearn.model_selection import KFold
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, precision_recall_fscore_support
 from functools import reduce
 import random
 import string
@@ -11,7 +11,7 @@ BASE_PATH = '../'
 DATA_PATH = BASE_PATH + 'dataset'
 MODELS_DIR = BASE_PATH + "models"
 
-## TODO test with dictionary return from test_function
+
 def cross_validate(model, X, Y, k, train_function, test_function):
     """
     Performs k-fold cross-validation on a given model.
@@ -57,7 +57,21 @@ def train_model(model, X_train, Y_train):
     model.fit(X_train, Y_train, epochs=10, batch_size=16, verbose=0)
 
 def evaluate_model(model, X_test, Y_test):
-    return {'acc': model.evaluate(X_test, Y_test)[1]}
+    acc = model.evaluate(X_test, Y_test)[1]
+    y_pred = [int(p + 0.5) for p in model.predict(X_test)]
+    ret = precision_recall_fscore_support(Y_test, y_pred)
+    print(ret)
+    return {
+        'acc': acc,
+        'precision_0': ret[0][0],
+        'precision_1': ret[0][1],
+        'recall_0': ret[1][0],
+        'recall_1': ret[1][1],
+        'f1_0': ret[2][0],
+        'f1_1': ret[2][1],
+        'support_0': ret[3][0],
+        'support_1': ret[3][1]
+    }
 
 def reset_weights(model):
     session = K.get_session()
