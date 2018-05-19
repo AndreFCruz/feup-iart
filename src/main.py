@@ -26,7 +26,7 @@ model = create_model(np.size(X_train, axis=1))
 # Train Model
 callbacks = [
         PRTensorBoard(log_dir=('../Graph/' + MODEL_NAME), write_images=True),
-        EarlyStopping(monitor='val_acc', patience=15)
+        EarlyStopping(monitor='val_acc', patience=20)
         ]
 
 ### NOTE Balancing class weights

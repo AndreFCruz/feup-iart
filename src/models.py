@@ -5,9 +5,11 @@ from keras.layers.advanced_activations import LeakyReLU
 
 def create_model(input_dim):
     input = Input(shape=(input_dim,))
-    x = Dense(2, activation='relu')(input)
-    # x = Dropout(0.5)(x)
-    # x = Dense(16, activation='relu')(x)
+    x = LeakyReLU(alpha=0.3)(input)
+    x = Dense(8)(x)
+    x = LeakyReLU(alpha=0.3)(x)
+    x = Dense(8)(x)
+    x = Activation('relu')(x)
     output = Dense(1, activation='sigmoid')(x)
 
     model = Model(inputs=input, outputs=output)
