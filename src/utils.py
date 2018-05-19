@@ -1,7 +1,7 @@
 import sys, os, io
 import numpy as np
 from keras import backend as K
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import KFold
 from sklearn.metrics import classification_report
 from functools import reduce
 import random
@@ -11,14 +11,14 @@ BASE_PATH = '../'
 DATA_PATH = BASE_PATH + 'dataset'
 MODELS_DIR = BASE_PATH + "models"
 
-
-def cross_validation(model, X, Y, k, train_function, test_function):
+## TODO test with dictionary return from test_function
+def cross_validate(model, X, Y, k, train_function, test_function):
     """
     Performs k-fold cross-validation on a given model.
     Calls the passed train_model function and test_model
      for every data split.
     """
-    kf = StratifiedKFold(n_splits=k)
+    kf = KFold(n_splits=k)
     scores = []
     for train_indices, test_indices in kf.split(X):
         X_train, X_test = X[train_indices], X[test_indices]
@@ -28,20 +28,36 @@ def cross_validation(model, X, Y, k, train_function, test_function):
         train_function(model, X_train, Y_train)
 
         # test/evaluate model
-        score = test_function(model, X_test, Y_test)
-        scores.append(score)
+        run_scores = test_function(model, X_test, Y_test)
+        scores.append(run_scores)
 
         # clear model weights for next iteration
         reset_weights(model)
 
-    # Return average of scores
-    return reduce((lambda x, y: x + y), scores) / len(scores)
+    # Sum scores
+    avg_scores = {}
+    for dic in scores:
+        print(dic)
+        for key in dic:
+            if key not in avg_scores:
+                avg_scores[key] = 0
+            avg_scores[key] += dic[key]
+
+    # Average scores
+    for key in avg_scores:
+        avg_scores[key] /= k
+
+    return avg_scores
+    
+
+def avg(lst):
+    return reduce((lambda x, y: x + y), lst) / len(lst)
 
 def train_model(model, X_train, Y_train):
-    model.fit(X_train, Y_train, epochs=10, batch_size=16)
+    model.fit(X_train, Y_train, epochs=10, batch_size=16, verbose=0)
 
 def evaluate_model(model, X_test, Y_test):
-    return model.evaluate(X_test, Y_test)[1]
+    return {'acc': model.evaluate(X_test, Y_test)[1]}
 
 def reset_weights(model):
     session = K.get_session()
