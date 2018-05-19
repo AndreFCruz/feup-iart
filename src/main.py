@@ -1,13 +1,15 @@
 import numpy as np
 from utils import *
 from models import create_model
-from keras.callbacks import TensorBoard
-from sklearn.metrics import precision_recall_curve, average_precision_score
-import matplotlib.pyplot as plt
+from keras.callbacks import TensorBoard, EarlyStopping
+from tensorboard import summary as summary_lib
+import tensorflow as tf
+from PRTensorBoard import PRTensorBoard
+from metrics import plot_precision_recall_curve
 
 np.random.seed(42)
 
-MODEL_NAME = '2nd' + (sys.argv[0] if len(sys.argv) > 0 else generate_random_string(n=4))
+MODEL_NAME = '2nd' + (sys.argv[1] if len(sys.argv) > 1 else generate_random_string(n=4))
 LOGS_FILE = '../logs/' + MODEL_NAME + '.txt'
 
 # Load data and split dataset
@@ -21,12 +23,25 @@ X_test, Y_test = test_set[:, :-1], test_set[:, -1]
 model = create_model(np.size(X_train, axis=1))
 
 # Train Model
-tb_callback = TensorBoard(log_dir='../Graph/' + MODEL_NAME, histogram_freq=5, write_graph=True, write_images=True)
+callbacks = [
+        # PRTensorBoard(log_dir=('../Graph/' + MODEL_NAME), write_images=True),
+        EarlyStopping(monitor='val_acc', patience=15)
+        ]
+# callbacks = [ TensorBoard(log_dir='../Graph/' + MODEL_NAME, histogram_freq=5, write_graph=True, write_images=True) ]
 
-model.fit(X_train, Y_train, epochs=10, batch_size=16,
+### NOTE trying to balance class weights
+from sklearn.utils import class_weight
+class_weight = class_weight.compute_class_weight('balanced',
+                                                 np.unique(Y_train),
+                                                 Y_train)
+print("Class weight: ", class_weight)
+###
+
+# Train Model
+model.fit(X_train, Y_train, epochs=100, batch_size=16,
         validation_data=(X_test, Y_test),
-        callbacks=[tb_callback]
-        # class_weight={0: 0.5, 1: 1.0}
+        callbacks=callbacks,
+        class_weight={0: 1, 1: 5}
         )
 
 
@@ -37,25 +52,11 @@ print("Overall Accuracy: %.2f\n" % (scores[1] * 100))
 print(evaluate_classwise(model, X_test, Y_test))
 logger.close()
 
-# Precision-Recall Curve
-Y_predictions = model.predict(X_test)
-precision, recall, _ = precision_recall_curve(Y_test, Y_predictions)
 
-average_precision = average_precision_score(Y_test, Y_predictions)
+# Randomly trying new things
+plot_precision_recall_curve(model, X_test, Y_test, 'pr_curve.png')
+## TODO
 
-plt.step(recall, precision, color='b', alpha=0.2,
-         where='post')
-plt.fill_between(recall, precision, step='post', alpha=0.2,
-                 color='b')
-
-plt.xlabel('Recall')
-plt.ylabel('Precision')
-plt.ylim([0.0, 1.05])
-plt.xlim([0.0, 1.0])
-plt.title('2-class Precision-Recall curve: AP={0:0.2f}'.format(
-          average_precision)
-        )
-plt.show()
 
 # K-Fold Cross-Validation
 # score = cross_validation(
