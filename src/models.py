@@ -15,3 +15,21 @@ def create_model(input_dim):
     model = Model(inputs=input, outputs=output)
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
     return model
+
+
+def create_model_grid_search(input_dim, first_neurons=8,
+                            second_neurons=8, activate_input=True,
+                            optimizer='adam'):
+    input = Input(shape=(input_dim,))
+    if activate_input:
+        x = LeakyReLU(alpha=0.3)(input)
+    x = Dense(first_neurons)(x if activate_input else input)
+    x = LeakyReLU(alpha=0.3)(x)
+    if second_neurons > 0:
+        x = Dense(second_neurons)(x)
+    x = Activation('relu')(x)
+    output = Dense(1, activation='sigmoid')(x)
+
+    model = Model(inputs=input, outputs=output)
+    model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
+    return model
