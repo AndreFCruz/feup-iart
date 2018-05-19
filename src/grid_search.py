@@ -3,9 +3,9 @@ from sklearn.model_selection import GridSearchCV
 import pickle
 
 
-def grid_search_params(create_model, param_grid, X, Y):
+def grid_search_params(create_model, param_grid, X, Y, epochs=50):
     # SKLearn wrapper for Keras classifier
-    model = KerasClassifier(build_fn=create_model, epochs=1, verbose=2)
+    model = KerasClassifier(build_fn=create_model, epochs=epochs, verbose=2)
     # Setup Grid
     grid = GridSearchCV(estimator=model, param_grid=param_grid)
     # Train Models
@@ -49,12 +49,12 @@ if __name__ == "__main__":
     param_grid = {
         'input_dim': [8],
         'first_neurons': [32, 16, 8, 4, 2],
-        'second_neurons': [16, 12, 4, 2],
+        'second_neurons': [16, 8, 4, 2],
         'optimizer': [SGD(), RMSprop(), Adadelta(), Adam(), Adamax(), Nadam()]
     }
 
     from models import create_model_grid_search
-    best_model = grid_search_params(create_model_grid_search, param_grid, X, Y)
+    best_model = grid_search_params(create_model_grid_search, param_grid, X, Y, epochs=75)
 
     from utils import evaluate_model
     evaluate_model(best_model.model, X, Y)
