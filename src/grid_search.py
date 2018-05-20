@@ -1,11 +1,12 @@
 from keras.wrappers.scikit_learn import KerasClassifier
 from sklearn.model_selection import GridSearchCV
 import pickle
+import pprint
 
 
 def grid_search_params(create_model, param_grid, X, Y):
     # SKLearn wrapper for Keras classifier
-    model = KerasClassifier(build_fn=create_model, epochs=1, verbose=2)
+    model = KerasClassifier(build_fn=create_model, epochs=75, verbose=2)
     # Setup Grid
     grid = GridSearchCV(estimator=model, param_grid=param_grid)
     # Train Models
@@ -34,6 +35,10 @@ def save_object(obj, filename):
     with open(filename, 'wb') as output:  # Overwrites any existing file.
         pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
 
+def pprint_dict(d):
+	pp = pprint.PrettyPrinter(indent=4)
+	pp.pprint(d)
+
 
 if __name__ == "__main__":
     from utils import load_pulsar_csv
@@ -49,9 +54,11 @@ if __name__ == "__main__":
     param_grid = {
         'input_dim': [8],
         'first_neurons': [32, 16, 8, 4, 2],
-        'second_neurons': [16, 12, 4, 2],
-        'optimizer': [SGD(), RMSprop(), Adadelta(), Adam(), Adamax(), Nadam()]
+        'second_neurons': [16, 12, 4, 2]
+        #'optimizer': [SGD(), RMSprop(), Adadelta(), Adam(), Adamax(), Nadam()]
     }
+    print("Grid Search Over: ")
+    pprint_dict(param_grid)
 
     from models import create_model_grid_search
     best_model = grid_search_params(create_model_grid_search, param_grid, X, Y)
