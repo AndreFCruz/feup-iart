@@ -64,6 +64,6 @@ if __name__ == "__main__":
     best_model = grid_search_params(create_model_grid_search, param_grid, X, Y, epochs=75)
 
     from utils import evaluate_model
-    evaluate_model(best_model.model, X, Y)
+    pprint_dict(evaluate_model(best_model.model, X, Y))
 
     logger.close()
