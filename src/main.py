@@ -27,15 +27,10 @@ rus = RandomUnderSampler(return_indices=True)
 X_resampled, Y_resampled, idx_resampled = rus.fit_sample(pulsars[:,:-1], pulsars[:,-1])
 print("Original data size: %d. Undersampled data size: %d" % (len(pulsars), len(X_resampled)))
 
-shuffled_indices = np.random.permutation(len(X_resampled))
-test_set_size = int(0.2 * len(X_resampled))
-test_indices = shuffled_indices[:test_set_size]
-train_indices = shuffled_indices[test_set_size:]
-X_train, Y_train = X_resampled[train_indices], Y_resampled[train_indices]
-X_test, Y_test = X_resampled[test_indices], Y_resampled[test_indices]
-
+X_train, Y_train = X_resampled, Y_resampled
 
 ## NOTE END of Undersampling
+
 
 # Create Model
 model = create_model(np.size(X_train, axis=1))
@@ -47,18 +42,18 @@ callbacks = [
         ]
 
 ## NOTE Balancing class weights
-# from sklearn.utils import class_weight
-# class_weight = class_weight.compute_class_weight('balanced',
-#                                                  np.unique(Y_train),
-#                                                  Y_train)
-# print("Class weight: ", class_weight)
-##
+from sklearn.utils import class_weight
+class_weight = class_weight.compute_class_weight('balanced',
+                                                 np.unique(Y_train),
+                                                 Y_train)
+print("Class weight: ", class_weight)
+#
 
 # Train Model
 model.fit(X_train, Y_train, epochs=100, batch_size=16,
         validation_data=(X_test, Y_test),
-        callbacks=callbacks
-        # class_weight=class_weight
+        callbacks=callbacks,
+        # class_weight={0: class_weight[0] * 3, 1: class_weight[1]}
         )
 
 
