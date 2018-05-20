@@ -17,7 +17,7 @@ def grid_search_params(create_model, param_grid, X, Y, epochs=50):
 
     # Save Best Model
     model_name = 'grid_search_best_' + ('%.2f' % (grid.best_score_ * 100)) + '.h5'
-    model_path = '../models' + model_name
+    model_path = '../models/' + model_name
     grid.best_estimator_.model.save(model_path)
     return grid.best_estimator_
 
