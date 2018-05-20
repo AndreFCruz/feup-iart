@@ -4,11 +4,11 @@ import pickle
 import pprint
 
 
-def grid_search_params(create_model, param_grid, X, Y, epochs=50):
+def grid_search_params(create_model, param_grid, X, Y, epochs=100, model_name=""):
     # SKLearn wrapper for Keras classifier
     model = KerasClassifier(build_fn=create_model, epochs=epochs, verbose=2)
     # Setup Grid
-    grid = GridSearchCV(estimator=model, param_grid=param_grid)
+    grid = GridSearchCV(estimator=model, param_grid=param_grid, cv=5)
     # Train Models
     grid_results = grid.fit(X, Y)
 
@@ -16,8 +16,8 @@ def grid_search_params(create_model, param_grid, X, Y, epochs=50):
     print_grid_search_results(grid_results)
 
     # Save Best Model
-    model_name = 'grid_search_best_' + ('%.2f' % (grid.best_score_ * 100)) + '.h5'
-    model_path = '../models/' + model_name
+    file_name = 'grid_search_best_' + model_name + ('_%.2f' % (grid.best_score_ * 100))
+    model_path = '../models/' + file_name + '.h5'
     grid.best_estimator_.model.save(model_path)
     return grid.best_estimator_
 
@@ -41,27 +41,32 @@ def pprint_dict(d):
 
 
 if __name__ == "__main__":
+    import sys
+    from utils import generate_random_string
+    MODEL_NAME = ('_'+sys.argv[1]+'_') if len(sys.argv) > 1 else generate_random_string(4)
+
     from utils import load_pulsar_csv
     pulsars = load_pulsar_csv()
     X, Y = pulsars[:, :-1], pulsars[:, -1]
 
     from Logger import Logger
-    logger = Logger('../logs/grid_search.txt')
+    logger = Logger('../logs/grid_search' + MODEL_NAME + '.txt')
 
     from keras.optimizers import SGD, RMSprop, Adagrad, Adadelta, Adam, Adamax, Nadam
 
     # Parameter Grid for Searching
     param_grid = {
         'input_dim': [8],
-        'first_neurons': [32, 16, 8, 4, 2],
-        'second_neurons': [16, 12, 4, 2]
-        #'optimizer': [SGD(), RMSprop(), Adadelta(), Adam(), Adamax(), Nadam()]
+        'first_neurons': [32],
+        'second_neurons': [16, 8, 4],
+        'optimizer': [SGD(), RMSprop(), Adadelta(), Adam(), Adamax(), Nadam()]
     }
     print("Grid Search Over: ")
     pprint_dict(param_grid)
 
     from models import create_model_grid_search
-    best_model = grid_search_params(create_model_grid_search, param_grid, X, Y, epochs=75)
+    best_model = grid_search_params(create_model_grid_search, param_grid, X, Y,
+                                    epochs=100, model_name=MODEL_NAME)
 
     from utils import evaluate_model
     pprint_dict(evaluate_model(best_model.model, X, Y))
